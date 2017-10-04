@@ -13,9 +13,13 @@ class SlickdealsSpider(Spider):
     ]
 
     def parse(self, response):
-        deal_items = response.xpath('//*[@class="itemTitle"]/text()').extract()
+        deal_items = Selector(response).xpath('//div[@class="fpItem  "]')
         for deal in deal_items:
             item = SlickdealsItem()
-            item['name'] = deal
+            item['name'] = deal.xpath('div/div[1]/div[@class="itemImageAndName"]/div[@class="itemImageLink"]/a[@class="itemTitle"]/text()').extract()[0]
+            if len(deal.xpath('div/div[1]/div[@class="itemInfoLine"]/div[@class="priceLine"]/div[@class="itemPrice  wide "]/text()').extract()) != 0:
+                item['price'] = deal.xpath('div/div[1]/div[@class="itemInfoLine"]/div[@class="priceLine"]/div[@class="itemPrice  wide "]/text()').extract()[0]
+            else:
+                item['price'] = 0
             yield item
 
